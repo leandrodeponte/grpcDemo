@@ -1,0 +1,84 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+	id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.22'
+	id 'com.google.protobuf' version '0.9.4'
+}
+
+group = 'com.google.grpc'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+repositories {
+	mavenCentral()
+}
+
+// Feel free to delete the comment at the next line. It is just for safely
+// updating the version in our release process.
+def grpcVersion = '1.61.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.25.1'
+def protocVersion = protobufVersion
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation "io.grpc:grpc-netty:${grpcVersion}"
+	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+	implementation "io.grpc:grpc-stub:${grpcVersion}"
+	implementation 'io.grpc:grpc-kotlin-stub:1.4.1'
+
+	runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+
+	testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+	testImplementation "io.grpc:grpc-inprocess:${grpcVersion}"
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.withType(KotlinCompile) {
+	kotlinOptions {
+		freeCompilerArgs += '-Xjsr305=strict'
+		jvmTarget = '17'
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+protobuf {
+	generatedFilesBaseDir = "${buildDir}/generated/sources/proto/files"
+	protoc {
+		artifact = "com.google.protobuf:protoc:${protobufVersion}"
+	}
+
+	plugins {
+		grpc {
+			artifact = "io.grpc:protoc-gen-grpc-java:1.61.0"
+		}
+	}
+	generateProtoTasks {
+		all().forEach {
+			it.plugins {
+				grpc{
+					outputSubDir = "grpc"
+				}
+			}
+		}
+	}
+}
+
+sourceSets{
+	main{
+		proto{
+			srcDir("$buildDir/generated/sources/proto/main/grpc")
+		}
+	}
+}

@@ -1,0 +1,22 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_outer_classname = "PersonServiceOuter";
+package com.example.grpcDemo.adapters.grpc.person;
+
+service PersonService{
+  rpc CreatePerson(PersonRequest) returns (PersonResponse){
+  }
+}
+
+message PersonRequest {
+  string cpf = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message PersonResponse {
+  int64 id = 1;
+  string cpf = 2;
+  string name = 3;
+  string email = 4;
+}
