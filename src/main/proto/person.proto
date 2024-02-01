@@ -6,6 +6,8 @@ package com.example.grpcDemo.adapters.grpc.person;
 service PersonService{
   rpc CreatePerson(PersonRequest) returns (PersonResponse){
   }
+  rpc Find(PersonQuery) returns (stream PersonListResponse){
+  }
 }
 
 message PersonRequest {
@@ -19,4 +21,12 @@ message PersonResponse {
   string cpf = 2;
   string name = 3;
   string email = 4;
+}
+
+message PersonQuery {
+  string cpf = 1;
+}
+
+message PersonListResponse {
+  repeated PersonResponse personListResponse = 1;
 }

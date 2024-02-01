@@ -8,21 +8,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-open class GrpcDemoApplication(val services: List<BindableService>): ApplicationRunner {
+open class GrpcDemoApplication(val services: List<BindableService>) : ApplicationRunner {
 
-	override fun run(args: ApplicationArguments?) {
-		val serverBuilder = ServerBuilder
-			.forPort(9090)
-//			.addService(PersonService())
-		services.forEach{
-			serverBuilder.addService(it)
-		}
-		serverBuilder
-			.build()
-			.start()
-	}
+    override fun run(args: ApplicationArguments?) {
+        val serverBuilder = ServerBuilder
+            .forPort(9090)
+        services.forEach {
+            serverBuilder.addService(it)
+        }
+        serverBuilder
+            .build()
+            .start()
+    }
 }
 
 fun main(args: Array<String>) {
-	runApplication<GrpcDemoApplication>(*args)
+    runApplication<GrpcDemoApplication>(*args)
 }

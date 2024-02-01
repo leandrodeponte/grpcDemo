@@ -1,24 +1,40 @@
 package com.google.grpc.grpcDemo.service
 
+import com.example.grpcDemo.adapters.grpc.person.PersonListResponse
+import com.example.grpcDemo.adapters.grpc.person.PersonQuery
 import com.example.grpcDemo.adapters.grpc.person.PersonRequest
 import com.example.grpcDemo.adapters.grpc.person.PersonResponse
 import com.example.grpcDemo.adapters.grpc.person.PersonServiceGrpc.PersonServiceImplBase
+import com.google.grpc.grpcDemo.repository.PersonRepository
 import io.grpc.stub.StreamObserver
 import org.springframework.stereotype.Service
-import kotlin.random.Random
 
 @Service
-class PersonService : PersonServiceImplBase() {
+class PersonService(val personRepository: PersonRepository) : PersonServiceImplBase() {
 
-    override fun createPerson(request: PersonRequest?, responseObserver: StreamObserver<PersonResponse>?) {
+    override fun createPerson(
+        request: PersonRequest?,
+        responseObserver: StreamObserver<PersonResponse>?
+    ) {
         val response = request?.let {
-            PersonResponse.newBuilder()
-                .setId(Random.nextLong())
-                .setName(it.name)
-                .setCpf(it.cpf)
-                .setEmail(it.email)
-                .build()
+            personRepository.save(it)
         }
+        responseObserver?.onNext(response)
+        responseObserver?.onCompleted()
+    }
+
+    override fun find(
+        request: PersonQuery?,
+        responseObserver: StreamObserver<PersonListResponse>?
+    ) {
+        val response = request?.let {
+            personRepository.find(it)
+        }
+        println("""Esta frase 
+            |ocupa mais de uma linha""".trimMargin())
+        println("Esta frase"
+            + "ocupa mais de"
+            + "uma linha")
         responseObserver?.onNext(response)
         responseObserver?.onCompleted()
     }
